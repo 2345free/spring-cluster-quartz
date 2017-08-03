@@ -4,15 +4,30 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="com.aaron.clusterquartz.job"/>
+    <context:component-scan base-package="com.example.clusterquartz.job"/>
+    
+    <context:property-placeholder location="classpath:application.properties"/>
 
-    <bean name="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <!-- tomcat -->
-        <!--<property name="jndiName" value="java:comp/env/jndi/mysql/quartz"/>-->
-
-        <!-- jboss -->
-        <property name="jndiName" value="java:/MysqlDS/quartz"/>
-    </bean>
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+	     <property name="url" value="${jdbc.url}" />
+	     <property name="username" value="${jdbc.username}" />
+	     <property name="password" value="${jdbc.password}" />
+	
+	     <property name="maxActive" value="20" />
+	     <property name="initialSize" value="1" />
+	     <property name="maxWait" value="60000" />
+	     <property name="minIdle" value="1" />
+	
+	     <property name="timeBetweenEvictionRunsMillis" value="60000" />
+	     <property name="minEvictableIdleTimeMillis" value="300000" />
+	
+	     <property name="testWhileIdle" value="true" />
+	     <property name="testOnBorrow" value="false" />
+	     <property name="testOnReturn" value="false" />
+	
+	     <property name="poolPreparedStatements" value="true" />
+	     <property name="maxOpenPreparedStatements" value="20" />
+	 </bean>
     <!-- 分布式事务配置 start -->
 
     <!-- 配置线程池-->
@@ -40,7 +55,7 @@
         <property name="applicationContextSchedulerContextKey" value="appli"/>
 
         <property name="jobFactory">
-            <bean class="com.aaron.clusterquartz.autowired.AutowiringSpringBeanJobFactory"/>
+            <bean class="com.example.clusterquartz.autowired.AutowiringSpringBeanJobFactory"/>
         </property>
 
         <property name="triggers">
@@ -60,10 +75,10 @@
 
     <!-- 配置Job详情 -->
     <bean name="printCurrentTimeJobs" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="com.aaron.clusterquartz.job.PrintCurrentTimeJobs"/>
+        <property name="jobClass" value="com.example.clusterquartz.job.PrintCurrentTimeJobs"/>
         <!--<property name="jobDataAsMap">
             <map>
-                <entry key="clusterQuartz" value="com.aaron.framework.clusterquartz.job.ClusterQuartz"/>
+                <entry key="clusterQuartz" value="com.example.framework.clusterquartz.job.ClusterQuartz"/>
             </map>
         </property>-->
         <property name="durability" value="true"/>
